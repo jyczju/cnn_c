@@ -36,14 +36,16 @@ int vad(Conv2dData *inp_data, bool *is_voice)
     uint16_t conv_out_len = 0;
     double linear_out[2]  = {0};
 
+    // Conv2dFilter filter = {
+    //     .channel = 1, .col = 2, .row = 1, .filter_num = 2, .data = model_0_weight};
     Conv2dFilter filter = {
-        .channel = 1, .col = 2, .row = 1, .filter_num = 2, .data = model_0_weight};
+        .channel = 1, .col = 8, .row = 1, .filter_num = 8, .data = model_0_weight};
     BatchNorm2d bn            = {.beta  = model_1_bias,
                                  .gamma = model_1_weight,
                                  .mean  = model_1_running_mean,
                                  .var   = model_1_running_var,
-                                 .size  = 2};
-    Conv2dConfig conv_config  = {.pad = 0, .stride = 2, .bn = &bn, .filter = &filter};
+                                 .size  = 8};
+    Conv2dConfig conv_config  = {.pad = 0, .stride = 8, .bn = &bn, .filter = &filter};
     LinearParam linear_config = {
         .inp_size = 240, .fea_size = 2, .weight = output_weight, .bias = output_bias};
 
@@ -52,8 +54,11 @@ int vad(Conv2dData *inp_data, bool *is_voice)
     *is_voice = false;
 
     memset(&conv_out, 0, sizeof(Conv2dData));
-    conv_out_len  = cal_conv_out_len(inp_data->col, 0, 2, 2);
-    conv_out.data = (double *)malloc(sizeof(double) * conv_out_len * 2);
+    // conv_out_len  = cal_conv_out_len(inp_data->col, 0, 2, 2);
+    // printf("inp_data->col: %d\n", inp_data->col);
+    conv_out_len  = cal_conv_out_len(inp_data->col, 0, 8, 8);
+    // printf("conv_out_len: %d\n", conv_out_len);
+    conv_out.data = (double *)malloc(sizeof(double) * conv_out_len * 8);
     if (!conv_out.data) {
         return ALGO_MALLOC_FAIL;
     }
